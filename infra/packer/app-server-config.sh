@@ -69,6 +69,14 @@ docker stack deploy dashboard --compose-file ./docker-compose.yml
 
 HERE
 
+cat << HERE >> /etc/docker/daemon.json
+{
+        "dns": ["1.1.1.1", "8.8.4.4", "8.8.8.8"]
+}
+
+HERE
+
+
 ###############################
 # Creds for backend debugging #
 ###############################
@@ -80,4 +88,5 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCh+eCqUzNI/uPNUuDg2gel51xkQoXFM+aYqXnIgVig
 
 HERE
 chown -R "${SUDO_USER}":"${SUDO_USER}" "${SSH_DIR}"
+
 
