@@ -170,6 +170,7 @@ resource "aws_autoscaling_group" "dash-asg" {
   name_prefix          = "dash-alb"
   max_size             = 3
   min_size             = 1
+  desired_capacity     = 3
   launch_configuration = "${aws_launch_configuration.dash-lc.name}"
   health_check_type    = "EC2"
   target_group_arns    = ["${module.alb.target_group_arns}"]
