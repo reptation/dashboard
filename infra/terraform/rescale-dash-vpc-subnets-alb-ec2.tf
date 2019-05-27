@@ -19,6 +19,20 @@ resource "aws_main_route_table_association" "main" {
   route_table_id = "${aws_route_table.r.id}"
 }
 
+resource "aws_route_table_association" "dash1" {
+  route_table_id = "${aws_route_table.r.id}"
+  subnet_id = "${aws_subnet.dash1.id}"
+}
+
+resource "aws_route_table_association" "dash2" {
+  route_table_id = "${aws_route_table.r.id}"
+  subnet_id = "${aws_subnet.dash2.id}"
+}
+
+resource "aws_route_table_association" "dash3" {
+  route_table_id = "${aws_route_table.r.id}"
+  subnet_id = "${aws_subnet.dash3.id}"
+}
 
 resource "aws_internet_gateway" "gw" {
   vpc_id = "${aws_vpc.main.id}"
