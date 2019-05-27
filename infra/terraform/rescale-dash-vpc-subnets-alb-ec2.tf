@@ -49,7 +49,7 @@ resource "aws_subnet" "dash1" {
   availability_zone = "us-east-1a"
 
   tags = {
-    Name = "Dash3"
+    Name = "Dash1"
   }
 }
 
