@@ -1,0 +1,38 @@
+{
+  "variables": {
+    "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
+    "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
+    "aws_db_pass":  "{{ env `AWS_DB_PASS`}}",
+    "dockerhub_user": "{{env `DOCKERHUB_USER`}}",
+    "dockerhub_pass": "{{env `DOCKERHUB_PASS`}}"
+  },
+  "sensitive-variables": ["aws_db_pass"],
+  "builders": [{
+    "type": "amazon-ebs",
+    "access_key": "{{user `aws_access_key`}}",
+    "secret_key": "{{user `aws_secret_key`}}",
+    "source_ami_filter": {
+      "filters": {
+      "virtualization-type": "hvm",
+      "name": "ubuntu/images/*ubuntu-bionic-18.04-amd64-server-*",
+      "root-device-type": "ebs"
+      },
+      "owners": ["099720109477"],
+      "most_recent": true
+    },
+    "instance_type": "t2.micro",
+    "ssh_username": "ubuntu",
+    "ami_name": "rescale-dashboard-ami-prod"
+  }],
+  "provisioners": [
+	{ 
+		"type": "shell",
+        "script": "./app-server-config.sh",
+        "environment_vars": ["AWS_DB_PASS={{user `aws_db_pass`}}", "DOCKERHUB_USER={{user `dockerhub_user`}}", "DOCKERHUB_PASS={{user `dockerhub_pass`}}"],
+        "execute_command": "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
+    }
+
+
+  ]
+
+}

@@ -1,0 +1,25 @@
+version: '3.6'
+services:
+  dash-front:
+    container_name: dash-front
+    build: ./portal
+    image: reptation/dash-front:1.0
+    ports:
+     - "5000:5000"
+    depends_on:
+      - dash-back
+  dash-back:
+    container_name: dash-back
+    build: ./hardware
+    image: reptation/dash-back:1.1.2
+    environment:
+      AWS_DB_PASS_FILE: /run/secrets/aws_db
+    secrets:
+      - aws_db
+    ports:
+     - "5001:5001"
+
+secrets:
+  aws_db:
+    external: true
+
