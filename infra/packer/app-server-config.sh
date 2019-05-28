@@ -56,7 +56,7 @@ docker push reptation/dash-front:"${FRONT_TAG:-latest}"
 docker push reptation/dash-back:"${BACK_TAG:-latest}"  
 
 cat << HERE > /etc/cron.d/update-stacks
-*/10 * * * *  root  bash -x /usr/local/bin/poll-updates.sh >> /var/log/dashboard-update.log
+*/10 * * * *  root  bash -x /usr/local/bin/poll-updates >> /var/log/dashboard-update.log
 HERE
 
 cat << HERE > /usr/local/bin/poll-updates.sh 
