@@ -80,7 +80,7 @@ Next, create an EC2 instance in the VPC. In absence of a VPN gateway or some oth
 
 ssh to the VM and copy the database.sql file. Install postgresql on the instance to run psql. 
 
-If there are authentication issues, you may need a line such as this to the bottom of /etc/postgresql/<VERSION>/main/pg_hba.conf:
+If there are authentication issues, you may need a line such as this to the bottom of /etc/postgresql/*VERSION*/main/pg_hba.conf:
 ```
 host    all             all             rds-dash-vpc.cdwhodhtdtav.us-east-1.rds.amazonaws.com               md5
 ```
