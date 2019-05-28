@@ -71,6 +71,8 @@ $ terraform plan
 $ terraform apply
 ```
 
+Currently, the default security group must still be manually added to the load balancer.
+
 ## Database Setup
 To setup the database, first create a db.t2.micro RDS instance and place it in the dashboard vpc. The db should not be accessible outside of the VPC (select no for public access). In this exercise the postgres superuser account was used to perform operations; in a production scenario the usage of this account would be more restricted. 
 
