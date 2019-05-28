@@ -182,8 +182,11 @@ resource "aws_autoscaling_group" "dash-asg" {
 resource "aws_launch_configuration" "dash-lc" {
   name_prefix   = "dash_lc"
   image_id      = "${data.aws_ami.dashboard.id}"
-  instance_type = "t2.microao"
+  instance_type = "t2.micro"
   security_groups = ["${aws_security_group.lb_sg_1.id}", "${aws_security_group.lb_sg_2.id}"]
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 #module "ec2_cluster" {
