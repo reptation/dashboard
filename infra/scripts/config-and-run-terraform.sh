@@ -1,25 +1,63 @@
 #!/bin/bash
 set -x
 
-# Creates a temporary var file for terraform. Represents a compromise between trying to set a lot of TF_VAR_foobar env var's and hard-coding stuff. 
+# create separate directories for each branch so each has a separate state file. ref: https://charity.wtf/2016/03/30/terraform-vpc-and-why-you-want-a-tfstate-file-per-env/
 
-# TODO create a policy where terraform apply can only run in regions not us-east-1
+cd $(dirname "$0"); 
+if [ -z "${GIT_BRANCH}" ];then
+    source ./get-creds.sh
+#    echo GIT_BRANCH env var must be set. Exiting.
+#    exit 1
+fi
+
+cd ../terraform
 
 # TODO switch statement with --yes|y to run terraform apply subject to policy restriction(s)
 
-TMP_VARS=tmp.vars.tfvars
+TMP_VARS_FILE=tmp.vars.tfvars
+TMP_VARS_FILE_TEMPLATE="${TMP_VARS_FILE}".env
 
-cd $(dirname "$0"); cd ../terraform
+use_branch_dir () {
+    if [ ! -d "./${GIT_BRANCH}" ]; then
+      NEW_BRANCH=true
+      echo "Creating new directory for environment ${GIT_BRANCH}"
+      mkdir "${GIT_BRANCH}"
+      # get started with template from prod
+      cp prod/prod.tf "${GIT_BRANCH}"/"${GIT_BRANCH}".tf; cp prod/"${TMP_VARS_FILE_TEMPLATE}" "${GIT_BRANCH}"/
+    fi
+
+    cd "${GIT_BRANCH}"
+}
 
 config_env_file () {
-    envsubst < terraform.tfvars.env > "${TMP_VARS}" ; 
+    envsubst < "${TMP_VARS_FILE_TEMPLATE}" > "${TMP_VARS_FILE}" ; 
     echo "vars configured for branch $GIT_BRANCH, $AWS_DEFAULT_REGION"
-    cat "${TMP_VARS}"
+    cat "${TMP_VARS_FILE}"
 }
 
 run_terraform_with_config () {
-    terraform plan -var-file="${TMP_VARS}"
-#    terraform apply -var-file="${TMP_VARS}"
+    if [ "${NEW_BRANCH}" == "true" ];then
+        terraform init
+    fi
+    
+    terraform plan -var-file="${TMP_VARS_FILE}"
+    
+    if [ "${AWS_DEFAULT_REGION}" == "us-east-1" ];then
+        echo "Sorry, us-east-1 is production, and does not currently go through this script"
+        exit 0
+    fi 
+
+    echo "Do you want to run terraform apply? (y/n)"
+    read response
+    case "${response}" in
+        y|Y) 
+            echo "Proceeding"
+            echo "Terraform would have run"
+            #terraform apply -var-file="${TMP_VARS}"
+        ;;
+        *) echo "Did not get y"
+        ;;
+    esac
 }
 
 cleanup_tmp_vars () {
@@ -27,6 +65,10 @@ cleanup_tmp_vars () {
     rm "${TMP_VARS}"
 }
 
+use_branch_dir
 config_env_file
 run_terraform_with_config
-cleanup_tmp_vars
+
+# leave the vars file
+#cleanup_tmp_vars
+
