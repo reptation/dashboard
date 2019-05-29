@@ -2,12 +2,10 @@ variable region {}
 variable git_branch {}
 
 provider "aws" {
-
 #  access_key = "${var.aws_access_key}"
 # use AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY env vars
 #  secret_key = "${var.aws_secret_key}"
   region     = "${var.region}"
-#  git_branch = "${var.git_branch}"  
 }
 
 
@@ -16,8 +14,9 @@ resource "aws_vpc" "main" {
     cidr_block = "10.0.0.0/16"
     
     tags = {
-        Name = "${var.region}-vpc-1-terraform"
+        Name = "${var.region}-vpc-${var.git_branch}"
         Creator = "terraform"
+        Environment = "${var.git_branch}"
     }
 }
 
@@ -47,6 +46,7 @@ resource "aws_internet_gateway" "gw" {
   tags = {
     Name = "main"
     Creator = "terraform"
+    Environment = "${var.git_branch}"
   }
 }
 
@@ -59,6 +59,7 @@ resource "aws_subnet" "dash1" {
   tags = {
     Name = "Dash1"
     Creator = "terraform"
+    Environment = "${var.git_branch}"
   }
 }
 
@@ -70,6 +71,7 @@ resource "aws_subnet" "dash2" {
   tags = {
     Name = "Dash2"
     Creator = "terraform"
+    Environment = "${var.git_branch}"
   }
 }
 
@@ -81,6 +83,7 @@ resource "aws_subnet" "dash3" {
   tags = {
     Name = "Dash3"
     Creator = "terraform"
+    Environment = "${var.git_branch}"
   }
 }
 
@@ -93,6 +96,7 @@ resource "aws_subnet" "dash4" {
   tags = {
     Name = "Dash4"
     Creator = "terraform"
+    Environment = "${var.git_branch}"
   }
 }
 
@@ -107,6 +111,7 @@ resource "aws_route_table" "r" {
   tags = {
     Name = "main"
     Creator = "terraform"
+    Environment = "${var.git_branch}"
   }
 }
 
@@ -146,6 +151,7 @@ resource "aws_security_group" "lb_sg_1" {
     Name = "allow_all"
     Port_Number = "80"
     Creator = "terraform"
+    Environment = "${var.git_branch}"
   }
 }
 
@@ -167,7 +173,7 @@ resource "aws_security_group" "lb_sg_2" {
     Name = "allow_all"
     Port_Number = "5000"
     Creator = "terraform"
-
+    Environment = "${var.git_branch}"
   }
 }
 
@@ -180,13 +186,14 @@ resource "aws_s3_bucket" "rescale-dash" {
     Name        = "Dashboard Logs"
     Environment = "Prod"
     Creator     = "terraform"
+    Environment = "${var.git_branch}"
   }
 }
 
 module "alb" {
   source                        = "terraform-aws-modules/alb/aws"
   load_balancer_name            = "dashboard-alb"
-  security_groups               = ["${aws_security_group.lb_sg_1.id}", "${aws_security_group.lb_sg_2.id}"]
+  security_groups               = ["${aws_security_group.lb_sg_1.id}", "${aws_security_group.lb_sg_2.id}", "${aws_default_security_group.default.id}"]
 # TODO: resolve 400 error with S3 logging bucket
   logging_enabled               = false
 #  log_bucket_name               = "${aws_s3_bucket.rescale-dash.id}"
@@ -209,7 +216,7 @@ data "aws_ami" "dashboard" {
   owners = ["self"]
   filter {                       
     name = "name"
-    values = ["rescale-dashboard-ami-prod"]
+    values = ["dashboard-ami-${var.git_branch}"]
   } 
 }
 
@@ -248,7 +255,7 @@ module "db" {
 
   name     = "demodb"
   username = "demouser"
-  password = "YourPwdShouldBeLongAndSecure!"
+  password = "${var.aws_db_pass}"
   port     = "5432"
 
   iam_database_authentication_enabled = true
