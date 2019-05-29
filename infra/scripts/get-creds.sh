@@ -7,4 +7,4 @@ export AWS_DEFAULT_REGION=$(pass aws/aws_default_region)
 export AWS_DB_PASS=$(pass aws/vpc/aws_db_pass)
 export DOCKERHUB_USER=$(pass dockerhub/dockerhub_user)
 export DOCKERHUB_PASS=$(pass dockerhub/dockerhub_pass)
-
+export GIT_BRANCH=$(git branch | grep '*' | tr -d '* ')
