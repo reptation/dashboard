@@ -4,7 +4,8 @@
     "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
     "aws_db_pass":  "{{ env `AWS_DB_PASS`}}",
     "dockerhub_user": "{{env `DOCKERHUB_USER`}}",
-    "dockerhub_pass": "{{env `DOCKERHUB_PASS`}}"
+    "dockerhub_pass": "{{env `DOCKERHUB_PASS`}}",
+    "git_branch": "{{env `GIT_BRANCH`}}"
   },
   "sensitive-variables": ["aws_db_pass"],
   "builders": [{
@@ -22,13 +23,13 @@
     },
     "instance_type": "t2.micro",
     "ssh_username": "ubuntu",
-    "ami_name": "rescale-dashboard-ami-prod"
+    "ami_name": "dashboard-ami-{{user `git_branch`}}"
   }],
   "provisioners": [
 	{ 
 		"type": "shell",
         "script": "./app-server-config.sh",
-        "environment_vars": ["AWS_DB_PASS={{user `aws_db_pass`}}", "DOCKERHUB_USER={{user `dockerhub_user`}}", "DOCKERHUB_PASS={{user `dockerhub_pass`}}"],
+        "environment_vars": ["AWS_DB_PASS={{user `aws_db_pass`}}", "DOCKERHUB_USER={{user `dockerhub_user`}}", "DOCKERHUB_PASS={{user `dockerhub_pass`}}", "GIT_BRANCH={{user `git_branch`}}"],
         "execute_command": "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
     }
 
