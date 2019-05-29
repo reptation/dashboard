@@ -1,12 +1,13 @@
 #!/bin/bash
 
-# Do not change this value without adjusting packer and terraform
-export AMI_NAME="rescale-dashboard-ami-prod"
-
 cd $(dirname "$0")
 . ./get-creds.sh
-
 cd ../
+
+# Do not change this value without adjusting packer and terraform
+# Note: currently modifying packer to use this same variable
+export AMI_NAME="dashboard-ami-${GIT_BRANCH}"
+
 
 echo "De-registering AMI with name ${AMI_NAME}, if one exists"
 sleep 3

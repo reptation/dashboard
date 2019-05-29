@@ -6,6 +6,10 @@ APP_REPO='https://github.com/reptation/dashboard.git'
 INFRA_REPO='https://github.com/reptation/scripts.git'
 SUDO_USER="ubuntu"
 SSH_DIR=/home/"${SUDO_USER}"/.ssh
+# GIT_BRANCH is obtained from environment or defaults to master
+PORTAL_PROD_BRANCH="1.0"
+HARDWARE_PROD_BRANCH="1.1.2"
+
 cd /tmp/
 
 # install docker, update software
@@ -22,6 +26,8 @@ fi
 mkdir -p "${WEB_ROOT}"
 cd "${WEB_ROOT}"
 git clone "${APP_REPO}" .
+# default to master if branch is undefined
+git checkout "${GIT_BRANCH-master}"
 
 pushd portal
 docker build -t dash-front:latest .
@@ -54,6 +60,11 @@ docker login --username="${DOCKERHUB_USER}" --password="${DOCKERHUB_PASS}"
 
 docker push reptation/dash-front:"${FRONT_TAG:-latest}" 
 docker push reptation/dash-back:"${BACK_TAG:-latest}"  
+
+# pull production images 
+docker pull reptation/dash-back:"${HARDWARE_PROD_BRANCH}"
+docker pull reptation/dash-front:"${PORTAL_PROD_BRANCH}"
+
 
 cat << HERE > /etc/cron.d/update-stacks
 */10 * * * *  root  bash -x /usr/local/bin/poll-updates >> /var/log/dashboard-update.log
@@ -88,5 +99,4 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCh+eCqUzNI/uPNUuDg2gel51xkQoXFM+aYqXnIgVig
 
 HERE
 chown -R "${SUDO_USER}":"${SUDO_USER}" "${SSH_DIR}"
-
 
