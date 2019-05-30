@@ -6,7 +6,6 @@ APP_REPO='https://github.com/reptation/dashboard.git'
 INFRA_REPO='https://github.com/reptation/scripts.git'
 SUDO_USER="ubuntu"
 SSH_DIR=/home/"${SUDO_USER}"/.ssh
-# GIT_BRANCH is obtained from environment or defaults to master
 PORTAL_PROD_BRANCH="1.0"
 HARDWARE_PROD_BRANCH="1.1.2"
 
@@ -30,11 +29,11 @@ git clone "${APP_REPO}" .
 git checkout "${GIT_BRANCH-master}"
 
 pushd portal
-docker build -t dash-front:latest .
+docker build -t dash-front:${GIT_BRANCH:anon} .
 popd 
 
 pushd hardware
-docker build -t dash-back:latest .
+docker build -t dash-back:${GIT_BRANCH:anon} .
 popd
 
 docker node ls
@@ -53,18 +52,14 @@ docker stack deploy dashboard --compose-file ./docker-compose.yml
 
 # bash construct to use 'latest' as default value if FRONT_TAG not set
 # tag and push branch for dev builds
-docker tag dash-back:"${FRONT_TAG:-latest}" reptation/dash-back:"${FRONT_TAG:-latest}"
-docker tag dash-front:"${BACK_TAG:-latest}" reptation/dash-front:"${BACK_TAG:-latest}"
-docker tag dash-back:"${FRONT_TAG:-latest}" reptation/dash-back:"${GIT_BRANCH:-latest}"
-docker tag dash-front:"${FRONT_TAG:-latest}" reptation/dash-front:"${GIT_BRANCH:-latest}"
+docker tag dash-back:"${GIT_BRANCH:-anon}" reptation/dash-back:"${GIT_BRANCH:-anon}"
+docker tag dash-front:"${GIT_BRANCH:-anon}" reptation/dash-front:"${GIT_BRANCH:-anon}"
 
 # dockerhub complains about this 
 docker login --username="${DOCKERHUB_USER}" --password="${DOCKERHUB_PASS}"
 
-docker push reptation/dash-front:"${FRONT_TAG:-latest}" 
-docker push reptation/dash-back:"${BACK_TAG:-latest}"  
-docker push reptation/dash-front:"${GIT_BRANCH:-latest}"  
-docker push reptation/dash-back:"${GIT_BRANCH:-latest}"  
+docker push reptation/dash-front:"${GIT_BRANCH:-anon}"  
+docker push reptation/dash-back:"${GIT_BRANCH:-anon}"  
 
 
 # pull production images 
