@@ -69,5 +69,5 @@ config_env_file
 run_terraform_with_config
 
 # leave the vars file
-#cleanup_tmp_vars
+cleanup_tmp_vars
 
