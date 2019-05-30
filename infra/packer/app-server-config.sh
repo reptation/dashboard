@@ -76,7 +76,7 @@ cat << HERE > /usr/local/bin/poll-updates.sh
 
 WEB_ROOT="/var/www/devops-homework" 
 cd $WEB_ROOT
-git pull origin master
+git pull origin $GIT_BRANCH
 docker stack deploy dashboard --compose-file ./docker-compose.yml
 
 HERE
