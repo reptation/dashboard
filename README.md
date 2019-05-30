@@ -74,9 +74,9 @@ $ terraform apply
 Currently, the default security group must still be manually added to the load balancer.
 
 ## Database Setup
-To setup the database, first create a db.t2.micro RDS instance and place it in the dashboard vpc. The db should not be accessible outside of the VPC (select no for public access). In this exercise the postgres superuser account was used to perform operations; in a production scenario the usage of this account would be more restricted. 
+The latest terraform configuration creates the PostgreSQL RDS instance but does not import the data. 
 
-Next, create an EC2 instance in the VPC. In absence of a VPN gateway or some other way to access the private IP address configure this temporary instance as publicly accessible but per best practices configure the security group to allow ssh port 22 to be accessible only from your IP address. 
+To connect to the db instance, create an EC2 instance in the VPC. In absence of a VPN gateway or some other way to access the private IP address configure this temporary instance as publicly accessible but per best practices configure the security group to allow ssh port 22 to be accessible only from your IP address. 
 
 ssh to the VM and copy the database.sql file. Install postgresql on the instance to run psql. 
 
