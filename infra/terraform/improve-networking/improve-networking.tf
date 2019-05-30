@@ -1,5 +1,6 @@
 variable region {}
 variable git_branch {}
+variable aws_db_pass {}
 
 provider "aws" {
 #  access_key = "${var.aws_access_key}"
@@ -91,7 +92,7 @@ resource "aws_subnet" "dash3" {
 resource "aws_subnet" "dash4" {
   vpc_id     = "${aws_vpc.main.id}"
   cidr_block = "10.0.4.0/24"
-  availability_zone = "${var.region}f"
+  availability_zone = "${var.region}c"
 
   tags = {
     Name = "Dash4"
@@ -178,8 +179,8 @@ resource "aws_security_group" "lb_sg_2" {
 }
 
 
-resource "aws_s3_bucket" "rescale-dash" {
-  bucket = "rescale-dash-b313ed6f5258"
+resource "aws_s3_bucket" "dash-logs" {
+  bucket = "dash-logs-${var.git_branch}"
   acl    = "private"
 
   tags = {
@@ -238,7 +239,7 @@ resource "aws_launch_configuration" "dash-lc" {
   name_prefix   = "dash_lc"
   image_id      = "${data.aws_ami.dashboard.id}"
   instance_type = "t2.micro"
-  security_groups = ["${aws_security_group.lb_sg_1.id}", "${aws_security_group.lb_sg_2.id}"]
+  security_groups = ["${aws_default_security_group.default.id}"]
   lifecycle {
     create_before_destroy = true
   }
@@ -248,7 +249,7 @@ module "db" {
   source = "terraform-aws-modules/rds/aws"
   
   identifier        = "dash-db-${var.git_branch}"
-  engine            = "postgresql"
+  engine            = "postgres"
   engine_version    = "11.2"
   instance_class    = "db.t2.micro"
   allocated_storage = 5
@@ -278,10 +279,10 @@ module "db" {
   }
 
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
-  subnet_ids = ["${aws_subnet.dash4.id}"]
+  subnet_ids = ["${aws_subnet.dash2.id}", "${aws_subnet.dash4.id}"]
 
   # DB parameter group
-  family = "postgres11.2"
+  family = "postgres11"
 
   # DB option group
   major_engine_version = "11.2"
