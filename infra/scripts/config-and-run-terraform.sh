@@ -52,8 +52,7 @@ run_terraform_with_config () {
     case "${response}" in
         y|Y) 
             echo "Proceeding"
-            echo "Terraform would have run"
-            #terraform apply -var-file="${TMP_VARS}"
+            terraform apply -var-file="${TMP_VARS_FILE}"
         ;;
         *) echo "Did not get y"
         ;;
@@ -62,7 +61,7 @@ run_terraform_with_config () {
 
 cleanup_tmp_vars () {
     echo "Removing temporary vars file"
-    rm "${TMP_VARS}"
+    rm "${TMP_VARS_FILE}"
 }
 
 use_branch_dir
