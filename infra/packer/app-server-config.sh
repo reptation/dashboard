@@ -54,9 +54,9 @@ docker stack deploy dashboard --compose-file ./docker-compose.yml
 # bash construct to use 'latest' as default value if FRONT_TAG not set
 # tag and push branch for dev builds
 docker tag dash-back:"${FRONT_TAG:-latest}" reptation/dash-back:"${FRONT_TAG:-latest}"
-docker tag dash-back:"${GIT_BRANCH:-latest}" reptation/dash-back:"${GIT_BRANCH:-latest}"
 docker tag dash-front:"${BACK_TAG:-latest}" reptation/dash-front:"${BACK_TAG:-latest}"
-docker tag dash-front:"${GIT_BRANCH:-latest}" reptation/dash-front:"${GIT_BRANCH:-latest}"
+docker tag dash-back:"${FRONT_TAG:-latest}" reptation/dash-back:"${GIT_BRANCH:-latest}"
+docker tag dash-front:"${FRONT_TAG:-latest}" reptation/dash-front:"${GIT_BRANCH:-latest}"
 
 # dockerhub complains about this 
 docker login --username="${DOCKERHUB_USER}" --password="${DOCKERHUB_PASS}"
