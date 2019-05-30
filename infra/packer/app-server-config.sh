@@ -52,14 +52,20 @@ printf "${AWS_DB_PASS}" | docker secret create aws_db -
 docker stack deploy dashboard --compose-file ./docker-compose.yml
 
 # bash construct to use 'latest' as default value if FRONT_TAG not set
+# tag and push branch for dev builds
 docker tag dash-back:"${FRONT_TAG:-latest}" reptation/dash-back:"${FRONT_TAG:-latest}"
+docker tag dash-back:"${GIT_BRANCH:-latest}" reptation/dash-back:"${GIT_BRANCH:-latest}"
 docker tag dash-front:"${BACK_TAG:-latest}" reptation/dash-front:"${BACK_TAG:-latest}"
+docker tag dash-front:"${GIT_BRANCH:-latest}" reptation/dash-front:"${GIT_BRANCH:-latest}"
 
 # dockerhub complains about this 
 docker login --username="${DOCKERHUB_USER}" --password="${DOCKERHUB_PASS}"
 
 docker push reptation/dash-front:"${FRONT_TAG:-latest}" 
 docker push reptation/dash-back:"${BACK_TAG:-latest}"  
+docker push reptation/dash-front:"${GIT_BRANCH:-latest}"  
+docker push reptation/dash-back:"${GIT_BRANCH:-latest}"  
+
 
 # pull production images 
 docker pull reptation/dash-back:"${HARDWARE_PROD_BRANCH}"
