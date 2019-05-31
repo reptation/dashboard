@@ -247,7 +247,7 @@ resource "aws_launch_configuration" "dash-lc" {
 
 module "db" {
   source = "terraform-aws-modules/rds/aws"
-  
+    
   identifier        = "dash-db-${var.git_branch}"
   engine            = "postgres"
   engine_version    = "11.2"
@@ -293,5 +293,41 @@ module "db" {
   # Database Deletion Protection
   deletion_protection = false
 }
-  
+
+# Didn't like it, trying Consul  
+#resource "aws_service_discovery_private_dns_namespace" "dashboard" {
+#  name        = "dashboard.rescale"
+#  description = "private domain created by terraform"
+#  vpc         = "${aws_vpc.main.id}"
+#}
+#
+#
+#resource "aws_service_discovery_service" "example" {
+#  name = "example"
+#
+#  dns_config {
+#    namespace_id = "${aws_service_discovery_private_dns_namespace.dashboard.id}"
+#
+#    dns_records {
+#      ttl  = 10
+#      type = "CNAME"
+#    }
+#  }
+#
+#  health_check_config {
+#    failure_threshold = 10
+#    resource_path     = "path"
+#    type              = "HTTP"
+#  }
+#}
+#
+#resource "aws_route53_record" "db" {
+#  zone_id = "${aws_service_discovery_private_dns_namespace.dashboard.hosted_zone}"
+#  name    = "db"
+#  type    = "A"
+#  ttl     = "5"
+#    
+#  
+#  records = ["${module.db.this_db_instance_address}"]
+#}
 

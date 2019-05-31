@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+#set -x
 
 # create separate directories for each branch so each has a separate state file. ref: https://charity.wtf/2016/03/30/terraform-vpc-and-why-you-want-a-tfstate-file-per-env/
 
