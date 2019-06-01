@@ -17,9 +17,7 @@ with open(db_password_file, "r") as myfile:
 #db_password=os.getenv("AWS_DB_PASS")
 db_password=theline[0]
 
-#db_host="rds-dash-vpc.cdwhodhtdtav.us-east-1.rds.amazonaws.com"
 db_host=os.getenv("AWS_DB_HOST")
-#db_host="dash-db-improve-networking.cle4smmwuzdc.us-east-2.rds.amazonaws.com"
 db_port=5432
 
 def slow_process_to_calculate_availability(provider, name):
