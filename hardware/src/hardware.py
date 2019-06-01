@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from flask.ext.cache import Cache
+from flask_cache import Cache
 import psycopg2
 import time
 import random
