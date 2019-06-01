@@ -11,7 +11,7 @@ services:
   dash-back:
     container_name: dash-back
     build: ./hardware
-    image: reptation/dash-back:1.1.2
+    image: reptation/dash-back:1.1.4
     environment:
       AWS_DB_PASS_FILE: /run/secrets/aws_db
     env_file:
