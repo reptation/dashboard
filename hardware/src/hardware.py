@@ -1,10 +1,13 @@
 from flask import Flask, request, jsonify
+from flask.ext.cache import Cache
 import psycopg2
 import time
 import random
 import os
 application = Flask(__name__)
 
+# Check Configuring Flask-Cache section for more details
+cache = Cache(app,config={'CACHE_TYPE': 'simple'})
 
 db_name="dashboard"
 db_user="postgres"
@@ -24,7 +27,7 @@ def slow_process_to_calculate_availability(provider, name):
     time.sleep(5)
     return random.choice(['HIGH', 'MEDIUM', 'LOW'])
 
-
+@cache.cached(timeout=5)
 @application.route('/hardware/')
 def hardware():
     con = psycopg2.connect(dbname=db_name, user=db_user, password=db_password, host=db_host, port=db_port)
