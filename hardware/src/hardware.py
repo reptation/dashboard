@@ -7,7 +7,7 @@ import os
 application = Flask(__name__)
 
 # Check Configuring Flask-Cache section for more details
-cache = Cache(app,config={'CACHE_TYPE': 'simple'})
+cache = Cache(application,config={'CACHE_TYPE': 'simple'})
 
 #db_name="dashboard"
 #db_user="postgres"
