@@ -50,7 +50,7 @@ run_terraform_with_config () {
     echo "Do you want to run terraform apply? (y/n)"
     read response
     case "${response}" in
-        y|Y) 
+        yes|y|Y) 
             echo "Proceeding"
             terraform apply -var-file="${TMP_VARS_FILE}"
         ;;

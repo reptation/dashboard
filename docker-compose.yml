@@ -14,10 +14,12 @@ services:
     image: reptation/dash-back:1.1.2
     environment:
       AWS_DB_PASS_FILE: /run/secrets/aws_db
+    env_file:
+      - .env
     secrets:
       - aws_db
     ports:
-     - "5001:5001"
+      - "5001:5001"
 
 secrets:
   aws_db:

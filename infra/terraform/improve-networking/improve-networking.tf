@@ -134,6 +134,31 @@ resource "aws_default_security_group" "default" {
   }
 }
 
+# don't apply but keep around for debugging
+resource "aws_security_group" "ec2_ssh_debug" {
+  name        = "ec2_ssh_debug"
+  description = "ec2_ssh_debug"
+  vpc_id      = "${aws_vpc.main.id}"
+
+  ingress {
+    from_port   = "22"
+    to_port     = "22"
+    protocol    = "tcp"
+    cidr_blocks = ["99.89.59.232/32"]
+  }
+
+  tags = {
+    Name = "ssh_home"
+    Port_Number = "22"
+    Creator = "terraform"
+    Environment = "${var.git_branch}"
+  }
+
+}
+
+  
+
+
 resource "aws_security_group" "lb_sg_1" {
   name        = "public_tcp_port_80"
   description = "Allow inbound traffic port 80"
@@ -217,6 +242,7 @@ data "aws_ami" "dashboard" {
   owners = ["self"]
   filter {                       
     name = "name"
+#    values = ["dashboard-ami-add-consul-to-ami"]
     values = ["dashboard-ami-${var.git_branch}"]
   } 
 }
@@ -226,7 +252,7 @@ resource "aws_autoscaling_group" "dash-asg" {
   name_prefix          = "dash-alb"
   max_size             = 3
   min_size             = 1
-  desired_capacity     = 3
+  desired_capacity     = 1
   launch_configuration = "${aws_launch_configuration.dash-lc.name}"
   health_check_type    = "EC2"
   target_group_arns    = ["${module.alb.target_group_arns}"]
@@ -294,7 +320,6 @@ module "db" {
   deletion_protection = false
 }
 
-# Didn't like it, trying Consul  
 #resource "aws_service_discovery_private_dns_namespace" "dashboard" {
 #  name        = "dashboard.rescale"
 #  description = "private domain created by terraform"

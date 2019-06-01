@@ -3,6 +3,7 @@
     "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
     "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
     "aws_db_pass":  "{{ env `AWS_DB_PASS`}}",
+    "aws_db_host":  "{{env `AWS_DB_HOST`}}",
     "dockerhub_user": "{{env `DOCKERHUB_USER`}}",
     "dockerhub_pass": "{{env `DOCKERHUB_PASS`}}",
     "git_branch": "{{env `GIT_BRANCH`}}"
@@ -29,7 +30,13 @@
 	{ 
 		"type": "shell",
         "script": "./app-server-config.sh",
-        "environment_vars": ["AWS_DB_PASS={{user `aws_db_pass`}}", "DOCKERHUB_USER={{user `dockerhub_user`}}", "DOCKERHUB_PASS={{user `dockerhub_pass`}}", "GIT_BRANCH={{user `git_branch`}}"],
+        "environment_vars": [
+            "AWS_DB_PASS={{user `aws_db_pass`}}", 
+            "AWS_DB_HOST={{user `aws_db_host`}}",
+            "DOCKERHUB_USER={{user `dockerhub_user`}}", 
+            "DOCKERHUB_PASS={{user `dockerhub_pass`}}", 
+            "GIT_BRANCH={{user `git_branch`}}"
+        ],
         "execute_command": "echo 'packer' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'"
     }
 
