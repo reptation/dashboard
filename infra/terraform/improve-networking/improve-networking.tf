@@ -1,6 +1,8 @@
 variable region {}
 variable git_branch {}
 variable aws_db_pass {}
+variable aws_db_name {}
+variable aws_db_user {}
 
 provider "aws" {
 #  access_key = "${var.aws_access_key}"
@@ -8,8 +10,6 @@ provider "aws" {
 #  secret_key = "${var.aws_secret_key}"
   region     = "${var.region}"
 }
-
-
 
 resource "aws_vpc" "main" {
     cidr_block = "10.0.0.0/16"
@@ -144,7 +144,8 @@ resource "aws_security_group" "ec2_ssh_debug" {
     from_port   = "22"
     to_port     = "22"
     protocol    = "tcp"
-    cidr_blocks = ["99.89.59.232/32"]
+    # restrict cidr blocks before deployment
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = {
@@ -280,8 +281,8 @@ module "db" {
   instance_class    = "db.t2.micro"
   allocated_storage = 5
 
-  name     = "demodb"
-  username = "demouser"
+  name     = "${var.aws_db_name}"
+  username = "${var.aws_db_user}"
   password = "${var.aws_db_pass}"
   port     = "5432"
 
