@@ -6,10 +6,10 @@ The app is composed on two microservices, dash-front and dash-back. dash-front c
 ```
     result = requests.get('http://dash-back:5001/hardware/').json()
 ```
-There is a run.sh script that combines the packer and terraform initialization steps, though terraform requires yes to be entered in order to run 'terraform apply'. 
+There is a run.sh script that combines the packer and terraform initialization steps, though terraform requires 'yes' to be entered in order to run 'terraform apply'. 
 
 ## Machine Image Creation
-Packer is used to create an Amazon machine image (AMI). The AMI setup routine installs docker, pulls the app code and builds the dash-front and dash-back images which are subsequently pushed to dockerhub as build artifacts. The dash-back backend service uses a docker secret to handle database authentication. The backend hardware.py reads the docker secret at /var/run/aws_db
+Packer is used to create an Amazon machine image (AMI). The AMI setup routine installs docker, pulls the app code and builds the dash-front and dash-back images which are subsequently pushed to dockerhub as build artifacts. The dash-back backend service uses a docker secret to handle database authentication. The backend hardware.py reads the secret at /run/secrets/aws_db
 
 Before packer is run, the following variables must be present in the environment:
 
@@ -80,7 +80,7 @@ To connect to the db instance, create an EC2 instance in the VPC. In absence of 
 
 ssh to the VM and copy the database.sql file. Install postgresql on the instance to run psql. 
 
-If there are authentication issues, you may need a line such as this to the bottom of /etc/postgresql/*VERSION*/main/pg_hba.conf:
+If there are authentication issues, you may need a line such as this at the bottom of /etc/postgresql/*VERSION*/main/pg_hba.conf:
 ```
 host    all             all             rds-dash-vpc.cdwhodhtdtav.us-east-1.rds.amazonaws.com               md5
 ```

@@ -56,6 +56,9 @@ printf "${AWS_DB_PASS}" | docker secret create aws_db -
 if [ ! -z "${AWS_DB_HOST}" ];then
     echo "AWS_DB_HOST=${AWS_DB_HOST}" >> .env
 fi
+echo "AWS_DB_HOST=${AWS_DB_USER}" >> .env
+ echo "AWS_DB_HOST=${AWS_DB_NAME}" >> .env
+
 
 docker stack deploy dashboard --compose-file ./docker-compose.yml
 

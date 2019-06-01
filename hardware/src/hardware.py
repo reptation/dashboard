@@ -9,9 +9,10 @@ application = Flask(__name__)
 # Check Configuring Flask-Cache section for more details
 cache = Cache(app,config={'CACHE_TYPE': 'simple'})
 
-db_name="dashboard"
-db_user="postgres"
-
+#db_name="dashboard"
+#db_user="postgres"
+db_name=os.getenv("AWS_DB_NAME")
+db_user=os.getenv("AWS_DB_USER")
 # docker secrets makes tmpfs file with cred
 db_password_file=os.getenv("AWS_DB_PASS_FILE")
 with open(db_password_file, "r") as myfile:
