@@ -29,7 +29,7 @@ def slow_process_to_calculate_availability(provider, name):
     return random.choice(['HIGH', 'MEDIUM', 'LOW'])
 
 @application.route('/hardware/')
-@cache.cached(timeout=50)
+@cache.cached(timeout=15)
 def hardware():
     con = psycopg2.connect(dbname=db_name, user=db_user, password=db_password, host=db_host, port=db_port)
     c = con.cursor()
