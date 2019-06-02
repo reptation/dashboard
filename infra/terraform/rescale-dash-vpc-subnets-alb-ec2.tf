@@ -1,16 +1,23 @@
+variable region {}
+variable git_branch {}
+
 provider "aws" {
 
 #  access_key = "${var.aws_access_key}"
 # use AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY env vars
 #  secret_key = "${var.aws_secret_key}"
-#  region     = "us-east-1"
+  region     = "${var.region}"
+  git_branch = "${var.git_branch}"  
 }
+
+
 
 resource "aws_vpc" "main" {
     cidr_block = "10.0.0.0/16"
     
     tags = {
-        Name = "us-east-1-vpc-1"
+        Name = "${var.region}-vpc-1-terraform"
+        Creator = "terraform"
     }
 }
 
@@ -39,6 +46,7 @@ resource "aws_internet_gateway" "gw" {
 
   tags = {
     Name = "main"
+    Creator = "terraform"
   }
 }
 
@@ -46,30 +54,45 @@ resource "aws_internet_gateway" "gw" {
 resource "aws_subnet" "dash1" {
   vpc_id     = "${aws_vpc.main.id}"
   cidr_block = "10.0.1.0/24"
-  availability_zone = "us-east-1a"
+  availability_zone = "${var.region}a"
 
   tags = {
     Name = "Dash1"
+    Creator = "terraform"
   }
 }
 
 resource "aws_subnet" "dash2" {
   vpc_id     = "${aws_vpc.main.id}"
   cidr_block = "10.0.2.0/24"
-  availability_zone = "us-east-1b"
+  availability_zone = "${var.region}b"
 
   tags = {
     Name = "Dash2"
+    Creator = "terraform"
   }
 }
 
 resource "aws_subnet" "dash3" {
   vpc_id     = "${aws_vpc.main.id}"
   cidr_block = "10.0.3.0/24"
-  availability_zone = "us-east-1c"
+  availability_zone = "${var.region}c"
 
   tags = {
     Name = "Dash3"
+    Creator = "terraform"
+  }
+}
+
+# f subnet intended to be private (db, etc.)
+resource "aws_subnet" "dash4" {
+  vpc_id     = "${aws_vpc.main.id}"
+  cidr_block = "10.0.4.0/24"
+  availability_zone = "${var.region}f"
+
+  tags = {
+    Name = "Dash4"
+    Creator = "terraform"
   }
 }
 
@@ -83,6 +106,7 @@ resource "aws_route_table" "r" {
 
   tags = {
     Name = "main"
+    Creator = "terraform"
   }
 }
 
@@ -103,6 +127,8 @@ resource "aws_security_group" "lb_sg_1" {
 
   tags = {
     Name = "allow_all"
+    Port_Number = "80"
+    Creator = "terraform"
   }
 }
 
@@ -122,6 +148,9 @@ resource "aws_security_group" "lb_sg_2" {
 
   tags = {
     Name = "allow_all"
+    Port_Number = "5000"
+    Creator = "terraform"
+
   }
 }
 
@@ -133,6 +162,7 @@ resource "aws_s3_bucket" "rescale-dash" {
   tags = {
     Name        = "Dashboard Logs"
     Environment = "Prod"
+    Creator     = "terraform"
   }
 }
 
@@ -144,15 +174,16 @@ module "alb" {
   logging_enabled               = false
 #  log_bucket_name               = "${aws_s3_bucket.rescale-dash.id}"
 #  log_location_prefix           = "my-alb-logs"
+# subnet f not on lb
   subnets                       = ["${aws_subnet.dash1.id}", "${aws_subnet.dash2.id}","${aws_subnet.dash3.id}"]
-  tags                          = "${map("Environment", "test")}"
+  tags                          = "${map("Environment", "${var.git_branch}")}"
   vpc_id                        = "${aws_vpc.main.id}"
 # TODO: add ssl 
 #  https_listeners               = "${list(map("certificate_arn", "arn:aws:iam::123456789012:server-certificate/test_cert-123456789012", "port", 443))}"
 #  https_listeners_count         = "1"
   http_tcp_listeners            = "${list(map("port", "80", "protocol", "HTTP"))}"
   http_tcp_listeners_count      = "1"
-  target_groups                 = "${list(map("name", "dash-workers", "backend_protocol", "HTTP", "backend_port", "5000"))}"
+  target_groups                 = "${list(map("name", "dash-workers-${var.git_branch}", "backend_protocol", "HTTP", "backend_port", "5000"))}"
   target_groups_count           = "1"
 }
 
@@ -161,7 +192,7 @@ data "aws_ami" "dashboard" {
   owners = ["self"]
   filter {                       
     name = "name"
-    values = ["rescale-dashboard-ami-prod"]
+    values = ["rescale-dashboard-ami-${var.git_branch}"]
   } 
 }
 
@@ -209,3 +240,5 @@ resource "aws_launch_configuration" "dash-lc" {
 #    Environment = "prod"
 #  }
 #}
+
+

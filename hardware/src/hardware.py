@@ -4,8 +4,9 @@ import psycopg2
 import time
 import random
 import os
+import redis
 application = Flask(__name__)
-
+r = redis.Redis(host='redis', port=6379, db=0)
 # Check Configuring Flask-Cache section for more details
 cache = Cache(application,config={'CACHE_TYPE': 'simple'})
 
@@ -29,7 +30,7 @@ def slow_process_to_calculate_availability(provider, name):
     return random.choice(['HIGH', 'MEDIUM', 'LOW'])
 
 @application.route('/hardware/')
-@cache.cached(timeout=15)
+#@cache.cached(timeout=15)
 def hardware():
     con = psycopg2.connect(dbname=db_name, user=db_user, password=db_password, host=db_host, port=db_port)
     c = con.cursor()
@@ -53,10 +54,16 @@ def hardware():
     ]
 
     con.close()
-
-    return jsonify(statuses)
-
+    # instead of return, will put value into Redis
+    r.set('statuses', statuses)    
+    #return jsonify(statuses)
 
 if __name__ == "__main__":
     application.run(host='0.0.0.0', port=5001)
+
+# update the cache every 5 seconds
+while true:
+    hardware
+    time.sleep(5)    
+
 

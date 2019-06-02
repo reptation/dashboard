@@ -20,6 +20,8 @@ services:
       - aws_db
     ports:
       - "5001:5001"
+  redis:
+    image: "redis:alpine"
 
 secrets:
   aws_db:
